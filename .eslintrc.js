@@ -9,5 +9,7 @@ module.exports = {
   ],
   rules: {
     'vue/multi-word-component-names': 'off',
+    'vue/no-use-v-if-with-v-for': 'off',
+    'vue/valid-v-for': 'off',
   }
 }
