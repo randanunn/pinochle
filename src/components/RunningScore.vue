@@ -11,7 +11,7 @@
 <!--        {{suit.name}}-->
         <v-img
           :width="20" :alt="`${suit.name}`"
-          :src="`/src/assets/${suit.name}.png`"/>
+          :src="`./assets/${suit.name}.png`"/>
       </v-btn>
       <v-text-field text
                     class="mt-2"
@@ -52,7 +52,7 @@
             <v-img
               class="mr-2"
               :width="15"
-              :src="`/assets/${gameScore.handDetails.trumpSuit}.png`"/>
+              :src="`./assets/${gameScore.handDetails.trumpSuit}.png`"/>
             {{ gameScore.handDetails.bid }} {{ gameScore.handDetails.biddingPlayer.name }}
           </div>
         </td>

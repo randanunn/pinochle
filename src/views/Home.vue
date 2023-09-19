@@ -91,8 +91,12 @@ const biddingTeamShotAndMadeIt = ref(false)
 const teamOneComponentRef = ref()
 const teamTwoComponentRef = ref()
 
+const { VITE_ENV } = import.meta.env
+
 onBeforeMount(() => {
-  window.addEventListener("beforeunload", preventNav)
+  if(VITE_ENV !== 'local') {
+    window.addEventListener("beforeunload", preventNav)
+  }
 })
 
 function preventNav(event) {
