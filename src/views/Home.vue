@@ -20,12 +20,19 @@
   </v-row>
   <v-row v-else>
     <v-col cols="12">
-      <v-card>
+      <v-card flat>
         <v-card-title>
-          Please enter player names:
+          Enter Player Information:
         </v-card-title>
         <v-card-text>
-          Team 1: <br>
+          <v-radio-group inline label="Number of Players"
+                         v-model="numberOfPlayers"
+                         @change="changePlayerCount()">
+            <v-radio label="Two" :value="2"></v-radio>
+            <v-radio label="Four" :value="4"></v-radio>
+          </v-radio-group>
+
+          <h3 class="mb-3">Team 1:</h3>
           <div v-for="(player, idx) in players.slice(0, (players.length / 2))">
             <v-text-field text
                           type="text"
@@ -36,20 +43,21 @@
             <v-checkbox label="First Dealer"
                         v-model="player.firstDealer"
                         :disabled="player.firstDealer"
+                        class="mb-4"
                         @input="unsetPlayFirstCheckboxes(player.id - 1)"
                         density="compact" hide-details></v-checkbox>
           </div>
           <br><br>
-          Team 2: <br>
+          <h3 class="mb-3">Team 2:</h3>
           <div v-for="(player, idx) in players.slice((players.length / 2), players.length)">
             <v-text-field text
                           type="text"
-
                           hide-details
                           label="Name"
                           v-model="player.name">
             </v-text-field>
             <v-checkbox label="First Dealer"
+                        class="mb-4"
                         v-model="player.firstDealer"
                         :disabled="player.firstDealer"
                         @input="unsetPlayFirstCheckboxes(player.id - 1)"
@@ -57,17 +65,12 @@
           </div>
         </v-card-text>
 
-        <v-radio-group inline label="Number of Players"
-                       v-model="numberOfPlayers"
-                       @change="changePlayerCount()">
-          <v-radio label="Two" :value="2"></v-radio>
-          <v-radio label="Four" :value="4"></v-radio>
-        </v-radio-group>
-
         <v-card-actions>
           <v-btn :color="Constants.SYSTEM_COLOR"
+                 variant="flat"
+                 class="ml-3"
                  @click="savePlayerNames(false)">
-            Save Player Names
+            Confirm Player Names & Start
           </v-btn>
         </v-card-actions>
       </v-card>
