@@ -1,5 +1,5 @@
 <template>
-  <v-row v-if="currentHand.trumpSuit && currentHand.biddingPlayer.id" class="height-50">
+  <v-row v-if="currentHand.trumpSuit && currentHand.biddingPlayer.id && currentHand.bid % Constants.TRICK_POINT_VALUE === 0" class="height-50">
     <v-col cols="10">
       <v-card elevation="0" class="px-5">
         <v-card-title>
@@ -36,8 +36,8 @@
 <!--              todo: should componetize this -->
               <table>
                 <tr v-for="scoring in column1">
-                  <td :class="{'subscore': scoring.subscore}">{{ scoring.name }}</td>
-                  <td>
+                  <td style="width: 150px;" :class="{'subscore': scoring.subscore}">{{ scoring.name }}</td>
+                  <td class="pr-2">
                     <v-checkbox label="Single"
                                 :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
                                  (scoring.affectedByRoundRobin && hasRoundRobin) ||
@@ -46,7 +46,21 @@
                                   (scoring.affectedByRoundRobin && hasRoundRobin) ||
                                   (scoring.subscore && !scoreOptions['RUN'].single)"
                                 v-model="scoring.single"
-                                @change="updateScore($event, scoring, false)"
+                                @change="updateScore($event, scoring, 1)"
+                                density="compact" hide-details>
+                    </v-checkbox>
+                  </td>
+                  <td class="pr-2">
+                    <v-checkbox label="Single"
+                                v-if="!scoring.hideSecondSingle"
+                                :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
+                                 (scoring.affectedByRoundRobin && hasRoundRobin) ||
+                                 (scoring.subscore && !scoreOptions['RUN'].single)"
+                                :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
+                                  (scoring.affectedByRoundRobin && hasRoundRobin) ||
+                                  (scoring.subscore && !scoreOptions['RUN'].single)"
+                                v-model="scoring.secondSingle"
+                                @change="updateScore($event, scoring, 2)"
                                 density="compact" hide-details>
                     </v-checkbox>
                   </td>
@@ -57,13 +71,13 @@
                                 :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon)"
                                 v-model="scoring.double"
                                 density="compact" hide-details
-                                @change="updateScore($event, scoring, true)">
+                                @change="updateScore($event, scoring, 3)">
                     </v-checkbox>
                   </td>
                 </tr>
               </table>
             </v-col>
-            <table>
+            <table class="ml-5">
               <tr v-for="scoring in column2">
                 <td :class="{'subscore': scoring.subscore}">{{ scoring.name }}</td>
                 <td>
@@ -75,7 +89,21 @@
                                   (scoring.affectedByRoundRobin && hasRoundRobin) ||
                                   (scoring.subscore && !scoreOptions['RUN'].single)"
                               v-model="scoring.single"
-                              @change="updateScore($event, scoring, false)"
+                              @change="updateScore($event, scoring, 1)"
+                              density="compact" hide-details>
+                  </v-checkbox>
+                </td>
+                <td class="pr-2">
+                  <v-checkbox label="Single"
+                              v-if="!scoring.hideSecondSingle"
+                              :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
+                                 (scoring.affectedByRoundRobin && hasRoundRobin) ||
+                                 (scoring.subscore && !scoreOptions['RUN'].single)"
+                              :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
+                                  (scoring.affectedByRoundRobin && hasRoundRobin) ||
+                                  (scoring.subscore && !scoreOptions['RUN'].single)"
+                              v-model="scoring.secondSingle"
+                              @change="updateScore($event, scoring, 2)"
                               density="compact" hide-details>
                   </v-checkbox>
                 </td>
@@ -86,7 +114,7 @@
                               :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon)"
                               v-model="scoring.double"
                               density="compact" hide-details
-                              @change="updateScore($event, scoring, true)">
+                              @change="updateScore($event, scoring, 3)">
                   </v-checkbox>
                 </td>
               </tr>
@@ -251,7 +279,8 @@ function getPlayerNames() {
   return players.value.filter(p => p.teamNumber === props.teamNumber).map(p => ' ' + p.name).toString()
 }
 
-function updateScore(event, scoring, isDouble) {
+function updateScore(event, scoring, scoreType) {
+  //scoreType: 1 = single, 2 = secondSingle, 3 = double
   //if checked then set the score value in local object
   if (event.target.checked) {
     let isTrumpFactor = 1
@@ -263,9 +292,17 @@ function updateScore(event, scoring, isDouble) {
     //todo: need to handle extra points in run
 
     //reset the other checkbox if needed
-    scoring.single = isDouble ? !scoring.double : true
-    scoring.double = !isDouble ? !scoring.single : true
-    scoreObject.value[scoring.name] = isDouble ? (scoring.doubleValue * isTrumpFactor) : (scoring.value * isTrumpFactor)
+    if(scoreType === 3) {
+      scoring.single = !scoring.double
+      scoring.secondSingle = !scoring.double
+    }
+    // scoring.single = scoreType === 3 ? !scoring.double : scoreType === :
+    // scoring.secondSingle = scoreType === 3 ? !scoring.double : true
+    scoring.double = scoreType !== 3 ? !scoring.single && !scoring.secondSingle : true
+
+    scoreObject.value[scoring.name] = scoring.double ? (scoring.doubleValue * isTrumpFactor)
+        : scoring.single && scoring.secondSingle ? ((scoring.value * 2) * isTrumpFactor)
+                                        : (scoring.value * isTrumpFactor)
 
   } else {
     scoreObject.value[scoring.name] = 0

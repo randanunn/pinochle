@@ -25,7 +25,7 @@
         * if renigng teams is shooting moon they get -1500
 
 * More data validation
-    * validate the bid is a multiple of trick score (10) modulo <- carrie
+    * runs/too many marriages/80 kings, etc
 
 * Fix double pinochle if each player has half
     * and each player having 100 aces

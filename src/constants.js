@@ -32,15 +32,17 @@ const SCORING = {
   EXTRA_KING: {
     name: 'Extra King',
     subscore: true,
+    hideSecondSingle: true,
     value: 20,
   },
   EXTRA_QUEEN: {
     name: 'Extra Queen',
+    hideSecondSingle: true,
     subscore: true,
     value: 20,
   },
   NINE: {
-    name: 'Nine of Trump',
+    name: '9 of Trump',
     value: 10,
     doubleValue: 20
   },
