@@ -109,7 +109,7 @@ import {storeToRefs} from "pinia";
 import cloneDeep from "lodash.clonedeep";
 
 const store = useAppStore();
-const {currentHand, players, scores} = storeToRefs(store)
+const {currentHand, players, scores, numberOfPlayers } = storeToRefs(store)
 
 const props = defineProps({
   resetCallback: Function
@@ -191,15 +191,24 @@ function completeHand() {
 }
 
 function getNextDealer(currentHandDealerId) {
-  switch (currentHandDealerId) {
-    case 1:
-      return players.value.find(p => p.id === 3)
-    case 2:
-      return players.value.find(p => p.id === 4)
-    case 3:
-      return players.value.find(p => p.id === 2)
-    case 4:
-      return players.value.find(p => p.id === 1)
+  if(numberOfPlayers.value === 4) {
+    switch (currentHandDealerId) {
+      case 1:
+        return players.value.find(p => p.id === 3)
+      case 2:
+        return players.value.find(p => p.id === 4)
+      case 3:
+        return players.value.find(p => p.id === 2)
+      case 4:
+        return players.value.find(p => p.id === 1)
+    }
+  } else {
+    switch (currentHandDealerId) {
+      case 1:
+        return players.value.find(p => p.id === 2)
+      case 2:
+        return players.value.find(p => p.id === 1)
+    }
   }
 
 }

@@ -26,68 +26,48 @@
         </v-card-title>
         <v-card-text>
           Team 1: <br>
-          <v-text-field text
-                        type="text"
-                        hide-details
-                        label="Player 1"
-                        v-model="players[0].name">
-          </v-text-field>
-          <v-checkbox label="First Dealer"
-                      v-model="players[0].firstDealer"
-                      :disabled="players[0].firstDealer"
-                      @input="unsetPlayFirstCheckboxes(0)"
-                      density="compact" hide-details></v-checkbox>
-          <v-text-field text
-                        type="text"
-                        hide-details
-                        label="Player 2"
-                        v-model="players[1].name">
-          </v-text-field>
-          <v-checkbox label="First Dealer"
-                      v-model="players[1].firstDealer"
-                      :disabled="players[1].firstDealer"
-                      @input="unsetPlayFirstCheckboxes(1)"
-                      density="compact" hide-details></v-checkbox>
+          <div v-for="(player, idx) in players.slice(0, (players.length / 2))">
+            <v-text-field text
+                          type="text"
+                          hide-details
+                          label="Name"
+                          v-model="player.name">
+            </v-text-field>
+            <v-checkbox label="First Dealer"
+                        v-model="player.firstDealer"
+                        :disabled="player.firstDealer"
+                        @input="unsetPlayFirstCheckboxes(player.id - 1)"
+                        density="compact" hide-details></v-checkbox>
+          </div>
           <br><br>
           Team 2: <br>
-          <v-text-field text
-                        type="text"
-                        hide-details
-                        label="Player 1"
-                        v-model="players[2].name">
-          </v-text-field>
-          <v-checkbox label="First Dealer"
-                      v-model="players[2].firstDealer"
-                      :disabled="players[2].firstDealer"
-                      @input="unsetPlayFirstCheckboxes(2)"
-                      density="compact" hide-details></v-checkbox>
-          <v-text-field text
-                        type="text"
-                        hide-details
-                        label="Player 2"
-                        v-model="players[3].name">
-          </v-text-field>
-          <v-checkbox label="First Dealer"
-                      v-model="players[3].firstDealer"
-                      :disabled="players[3].firstDealer"
-                      @input="unsetPlayFirstCheckboxes(3)"
-                      density="compact" hide-details></v-checkbox>
+          <div v-for="(player, idx) in players.slice((players.length / 2), players.length)">
+            <v-text-field text
+                          type="text"
+
+                          hide-details
+                          label="Name"
+                          v-model="player.name">
+            </v-text-field>
+            <v-checkbox label="First Dealer"
+                        v-model="player.firstDealer"
+                        :disabled="player.firstDealer"
+                        @input="unsetPlayFirstCheckboxes(player.id - 1)"
+                        density="compact" hide-details></v-checkbox>
+          </div>
         </v-card-text>
+
         <v-radio-group inline label="Number of Players"
                        v-model="numberOfPlayers"
-                       @change="setSliderSync()">
+                       @change="changePlayerCount()">
           <v-radio label="Two" :value="2"></v-radio>
           <v-radio label="Four" :value="4"></v-radio>
         </v-radio-group>
+
         <v-card-actions>
           <v-btn :color="Constants.SYSTEM_COLOR"
-                 :disabled="!players[0].name || !players[1].name || !players[2].name || !players[3].name"
                  @click="savePlayerNames(false)">
             Save Player Names
-          </v-btn>
-          <v-btn :color="Constants.SYSTEM_COLOR"
-                 @click="savePlayerNames(true)">
-            Use Default Player Names
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -121,7 +101,20 @@ onBeforeMount(() => {
   }
 })
 
-function setSliderSync() {
+function changePlayerCount() {
+  players.value = []
+  for( let i = 0; i < numberOfPlayers.value; i++ ) {
+    let id = i + 1
+    players.value.push({
+      id: id,
+      name: 'Player ' + id,
+      teamNumber: id <= numberOfPlayers.value / 2 ? 1 : 2,
+      firstDealer: i === 0
+    })
+  }
+
+  console.log('randalogger',players.value)
+  // sync/unsync the sliders
   slidersSynced.value = numberOfPlayers.value !== 2
 }
 
@@ -133,13 +126,7 @@ function preventNav(event) {
   event.returnValue = ""
 }
 
-function savePlayerNames(useDefaults) {
-  if(useDefaults) {
-    players.value[0].name = Constants.DEFAULT_PLAYER_NAMES[0]
-    players.value[1].name = Constants.DEFAULT_PLAYER_NAMES[1]
-    players.value[2].name = Constants.DEFAULT_PLAYER_NAMES[2]
-    players.value[3].name = Constants.DEFAULT_PLAYER_NAMES[3]
-  }
+function savePlayerNames() {
   showPlayers.value = false
   scoringStarted.value = true
   currentHand.value.dealingPlayer = cloneDeep(players.value.find(p => p.firstDealer))
