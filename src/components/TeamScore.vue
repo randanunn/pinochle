@@ -1,68 +1,110 @@
 <template>
-  <v-row v-if="currentHand.trumpSuit && currentHand.biddingPlayer.id">
+  <v-row v-if="currentHand.trumpSuit && currentHand.biddingPlayer.id" class="height-50">
     <v-col cols="10">
-      <v-card elevation="0" class="pa-5">
-        Team {{ teamNumber }}
-        Meld: {{ teamNumber === 1 ? currentHand.teamOne.meld : currentHand.teamTwo.meld }}
-        Tricks: {{ teamNumber === 1 ? currentHand.teamOne.tricks : currentHand.teamTwo.tricks }}
-        Tricks Value:
-        {{ teamNumber === 1 ? currentHand.teamOne.tricks * Constants.TRICK_POINT_VALUE : currentHand.teamTwo.tricks * Constants.TRICK_POINT_VALUE }}
-      <span v-if="teamNumber === currentHand.biddingPlayer.teamNumber"
-        :class="{'error': tricksRequired > Constants.AVAILABLE_TRICKS}">
-        Tricks Required: {{ tricksRequired }}
-      </span>
-        <br>
-        Players: {{ getPlayerNames() }}
-
-        <v-checkbox v-if="teamNumber === currentHand.biddingPlayer.teamNumber"
-                    label="Shoot the Moon"
-                    v-model="currentHand.shootingTheMoon"
-                    @change="resetScoreObject"
-                    density="compact" hide-details>
-        </v-checkbox>
-
-
-        <div>
-          <div class="scoring-card"
-               :class="{'subscore': scoring.subscore}"
-               v-for="(scoring, idx) in scoreOptions"
-               :key="idx">
-
-            {{ scoring.name }}
-
-            <div class="d-inline-block">
-              <v-checkbox label="Single"
-                          class="d-inline-block"
-                          :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
-                                 (scoring.affectedByRoundRobin && hasRoundRobin) ||
-                                 (scoring.subscore && !scoreOptions['RUN'].single)"
-                          :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
-                                  (scoring.affectedByRoundRobin && hasRoundRobin) ||
-                                  (scoring.subscore && !scoreOptions['RUN'].single)"
-                          v-model="scoring.single"
-                          @change="updateScore($event, scoring, false)"
+      <v-card elevation="0" class="px-5">
+        <v-card-title>
+          <v-toolbar flat color="transparent" density="compact">
+            <v-toolbar-title class="ml-0">
+              Team {{ teamNumber }}: {{ getPlayerNames() }}
+            </v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-toolbar-items>
+              <v-checkbox v-if="teamNumber === currentHand.biddingPlayer.teamNumber"
+                          label="Shoot the Moon"
+                          v-model="currentHand.shootingTheMoon"
+                          @change="resetScoreObject"
                           density="compact" hide-details>
               </v-checkbox>
-              <v-checkbox v-if="scoring.doubleValue"
-                          label="Double"
-                          class="d-inline-block"
-                          :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon)"
-                          :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon)"
-                          v-model="scoring.double"
-                          density="compact" hide-details
-                          @change="updateScore($event, scoring, true)">
-              </v-checkbox>
-            </div>
-          </div>
-        </div>
+            </v-toolbar-items>
+          </v-toolbar>
+        </v-card-title>
+        <v-card-subtitle>
+          Meld: {{ teamNumber === 1 ? currentHand.teamOne.meld : currentHand.teamTwo.meld }} <br>
+          Tricks: {{ teamNumber === 1 ? currentHand.teamOne.tricks : currentHand.teamTwo.tricks }} <br>
+          Tricks Value:
+          {{
+            teamNumber === 1 ? currentHand.teamOne.tricks * Constants.TRICK_POINT_VALUE : currentHand.teamTwo.tricks * Constants.TRICK_POINT_VALUE
+          }} <br>
+          <span v-if="teamNumber === currentHand.biddingPlayer.teamNumber"
+                :class="{'error': tricksRequired > Constants.AVAILABLE_TRICKS}">
+            Tricks Required: {{ tricksRequired }}
+          </span>
+        </v-card-subtitle>
+        <v-card-text>
+          <v-row>
+            <v-col cols="6">
+<!--              todo: should componetize this -->
+              <table>
+                <tr v-for="scoring in column1">
+                  <td :class="{'subscore': scoring.subscore}">{{ scoring.name }}</td>
+                  <td>
+                    <v-checkbox label="Single"
+                                :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
+                                 (scoring.affectedByRoundRobin && hasRoundRobin) ||
+                                 (scoring.subscore && !scoreOptions['RUN'].single)"
+                                :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
+                                  (scoring.affectedByRoundRobin && hasRoundRobin) ||
+                                  (scoring.subscore && !scoreOptions['RUN'].single)"
+                                v-model="scoring.single"
+                                @change="updateScore($event, scoring, false)"
+                                density="compact" hide-details>
+                    </v-checkbox>
+                  </td>
+                  <td>
+                    <v-checkbox v-if="scoring.doubleValue"
+                                label="Double"
+                                :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon)"
+                                :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon)"
+                                v-model="scoring.double"
+                                density="compact" hide-details
+                                @change="updateScore($event, scoring, true)">
+                    </v-checkbox>
+                  </td>
+                </tr>
+              </table>
+            </v-col>
+            <table>
+              <tr v-for="scoring in column2">
+                <td :class="{'subscore': scoring.subscore}">{{ scoring.name }}</td>
+                <td>
+                  <v-checkbox label="Single"
+                              :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
+                                 (scoring.affectedByRoundRobin && hasRoundRobin) ||
+                                 (scoring.subscore && !scoreOptions['RUN'].single)"
+                              :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
+                                  (scoring.affectedByRoundRobin && hasRoundRobin) ||
+                                  (scoring.subscore && !scoreOptions['RUN'].single)"
+                              v-model="scoring.single"
+                              @change="updateScore($event, scoring, false)"
+                              density="compact" hide-details>
+                  </v-checkbox>
+                </td>
+                <td>
+                  <v-checkbox v-if="scoring.doubleValue"
+                              label="Double"
+                              :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon)"
+                              :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon)"
+                              v-model="scoring.double"
+                              density="compact" hide-details
+                              @change="updateScore($event, scoring, true)">
+                  </v-checkbox>
+                </td>
+              </tr>
+            </table>
+            <v-col cols="6"></v-col>
+          </v-row>
+
+        </v-card-text>
       </v-card>
     </v-col>
     <v-col cols="2" class="text-center pt-7">
       Trick Count:
+      <v-btn color="indigo" variant="text" @click="resetTrickCounts()">Reset</v-btn>
       <v-slider
         :model-value="trickCount"
         :color="sliderColor"
         thumb-label="always"
+        density="compact"
         @update:model-value="changeSlider($event)"
         track-color="grey"
         direction="vertical"
@@ -90,7 +132,6 @@
           ></v-btn>
         </template>
       </v-slider>
-      <v-btn color="indigo" @click="resetTrickCounts()">Reset</v-btn>
     </v-col>
   </v-row>
 </template>
@@ -113,9 +154,6 @@ const scoreOptions = ref({})
 const scoreObject = ref({})
 const hasRoundRobin = ref(false)
 
-// const meldScore = computed(() => {
-//   return Object.values(scoreObject.value).reduce((total, val) => val + total, 0)
-// })
 const trickCount = computed(() => {
   return props.teamNumber === 1 ? currentHand.value.teamOne.tricks : currentHand.value.teamTwo.tricks
 })
@@ -123,6 +161,27 @@ const tricksRequired = computed(() => {
   let meldScore = props.teamNumber === 1 ? currentHand.value.teamOne.meld : currentHand.value.teamTwo.meld
   return currentHand.value.shootingTheMoon ? Constants.AVAILABLE_TRICKS : Math.max(1, ((currentHand.value.bid - meldScore) / 10))
 })
+
+//todo: there has to be a better way??
+const column1 = computed(() => {
+  const [list1] = partition(scoreOptions.value)
+  return list1
+})
+const column2 = computed(() => {
+  const [list1, list2] = partition(scoreOptions.value)
+  return list2
+})
+
+const partition = x =>
+  [x]
+    .map(x => Object.entries(x))
+    .map(x => x.reduce(([l, r], x, i) =>
+        i <= 6
+          ? [[...l, x], r]
+          : [l, [...r, x]],
+      [[], []]))
+    .map(x => x.map(x => Object.fromEntries(x)))
+    .pop();
 
 const sliderColor = ref('indigo')
 
@@ -189,7 +248,7 @@ function resetScoreObject() {
 }
 
 function getPlayerNames() {
-  return players.value.filter(p => p.teamNumber === props.teamNumber).map(p => p.name)
+  return players.value.filter(p => p.teamNumber === props.teamNumber).map(p => ' ' + p.name).toString()
 }
 
 function updateScore(event, scoring, isDouble) {
@@ -252,7 +311,7 @@ function updateScore(event, scoring, isDouble) {
 }
 
 function updateTeamMeld() {
-  if(props.teamNumber === 1) {
+  if (props.teamNumber === 1) {
     currentHand.value.teamOne.meld = Object.values(scoreObject.value).reduce((total, val) => val + total, 0)
   } else {
     currentHand.value.teamTwo.meld = Object.values(scoreObject.value).reduce((total, val) => val + total, 0)
@@ -266,13 +325,7 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-.scoring-card {
-  display: flex;
-  height: 40px;
-  align-items: center;
-}
-
 .subscore {
-  margin-left: 20px;
+  padding-left: 20px;
 }
 </style>
