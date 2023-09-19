@@ -307,8 +307,6 @@ function updateScore(event, scoring, scoreType) {
   //if checked then set the score value in local object
   if (event.target.checked) {
 
-    //todo: need to handle extra points in run
-
     //reset the other checkbox if needed
     if(scoreType === 3) {
       scoring.single = !scoring.double

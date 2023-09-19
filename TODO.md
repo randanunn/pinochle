@@ -26,6 +26,11 @@
 
 * More data validation
     * runs/too many marriages/80 kings, etc
+    
+* add question to first page for 2 handed, 4 handed
+    * if 2/3 then dont link the trick count sliders to each other
 
+* maybe one day add in 3 handed
+* 5 handed when you love mom enough
 ```
 
