@@ -49,7 +49,7 @@
     <v-card variant="outlined" class="mt-4 mr-4 pa-3 score-card">
 
 
-      <table class="one-hunned">
+      <table class="one-hunned pb-6">
         <thead>
         <tr>
           <th class="team-score-column">Team 1</th>
