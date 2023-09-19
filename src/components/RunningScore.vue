@@ -97,6 +97,49 @@
         </tbody>
       </table>
     </v-card>
+
+    <v-card variant="outlined" class="mt-4 mr-4 pa-3 score-card" v-if="games.length > 0">
+      <div v-for="(game, idx) in games">
+        <strong>Game {{ game.gameNumber }} Final Score</strong>
+        <div>
+          <span :class="{'success': game.teamOneTotal > game.teamTwoTotal}">Team 1: {{ game.teamOneTotal }} </span>
+          <span :class="{'success': game.teamOneTotal < game.teamTwoTotal}" class="ml-4">Team 2: {{ game.teamTwoTotal }}</span>
+        </div>
+      </div>
+    </v-card>
+
+    <v-dialog width="500">
+      <template v-slot:activator="{ props }">
+        <v-btn :color="Constants.SYSTEM_COLOR"
+               v-bind="props"
+               class="new-game-button">
+          New Game
+        </v-btn>
+      </template>
+
+      <template v-slot:default="{ isActive  }">
+        <v-card title="Confirm">
+          <v-card-text>
+            Are you sure you want to start a new game?
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              @click="isActive.value = false">
+              No
+            </v-btn>
+            <v-btn
+              :color="Constants.SYSTEM_COLOR"
+              variant="text"
+              @click="[ isActive.value = false, createNewGame() ]">
+              Yes
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </template>
+    </v-dialog>
+
   </div>
 </template>
 
@@ -109,7 +152,7 @@ import {storeToRefs} from "pinia";
 import cloneDeep from "lodash.clonedeep";
 
 const store = useAppStore();
-const {currentHand, players, scores, numberOfPlayers } = storeToRefs(store)
+const {currentHand, players, scores, numberOfPlayers, games} = storeToRefs(store)
 
 const props = defineProps({
   resetCallback: Function
@@ -132,7 +175,6 @@ const teamTwoTotal = computed(() => {
 function setTrumpSuit(suitName) {
   currentHand.value.trumpSuit = suitName
 }
-
 
 function completeHand() {
   //reset value
@@ -190,8 +232,26 @@ function completeHand() {
   props.resetCallback()
 }
 
+function createNewGame() {
+  //reset all the things
+  games.value.push({
+    gameNumber: games.value.length + 1,
+    teamOneTotal: teamOneTotal.value,
+    teamTwoTotal: teamTwoTotal.value,
+    scores: cloneDeep(scores.value)
+  })
+  let tempDealingPlayer = {
+    ...currentHand.value.dealingPlayer
+  }
+
+  props.resetCallback()
+  currentHand.value = cloneDeep(Constants.NEW_BLANK_HAND)
+  currentHand.value.dealingPlayer = tempDealingPlayer
+  scores.value = []
+}
+
 function getNextDealer(currentHandDealerId) {
-  if(numberOfPlayers.value === 4) {
+  if (numberOfPlayers.value === 4) {
     switch (currentHandDealerId) {
       case 1:
         return players.value.find(p => p.id === 3)
@@ -228,7 +288,7 @@ function changeBid(increment) {
 }
 
 #bid-input[type=number] {
-  -moz-appearance:textfield; /* Firefox */
+  -moz-appearance: textfield; /* Firefox */
 }
 </style>
 
@@ -243,12 +303,15 @@ function changeBid(increment) {
   width: 50px;
   max-width: 50px;
 }
+
 .team-score-column {
   width: 100px;
 }
+
 .bid-column {
   width: 200px
 }
+
 .deal-column {
   width: 75px;
 }
@@ -258,5 +321,9 @@ function changeBid(increment) {
   bottom: 10px;
 }
 
-
+.new-game-button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
 </style>

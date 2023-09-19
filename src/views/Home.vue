@@ -116,7 +116,6 @@ function changePlayerCount() {
     })
   }
 
-  console.log('randalogger',players.value)
   // sync/unsync the sliders
   slidersSynced.value = numberOfPlayers.value !== 2
 }

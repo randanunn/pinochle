@@ -3,9 +3,6 @@
 ### Stuff
 
 ```
-* Allow starting a new game with same players 
-    - continue with next dealer 
-
 * Handle winning/losing a game
     * going out backwards
     * going over 1500
