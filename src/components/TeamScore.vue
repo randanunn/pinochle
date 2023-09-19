@@ -298,13 +298,14 @@ function getPlayerNames() {
 
 function updateScore(event, scoring, scoreType) {
   //scoreType: 1 = single, 2 = secondSingle, 3 = double
+  let isTrumpFactor = 1
+  // handle extra points for trump marriage (pretty sure these names only include the suit if it is a marriage so far)
+  if (currentHand.value.trumpSuit && scoring.name.includes(currentHand.value.trumpSuit)) {
+    isTrumpFactor = 2
+  }
+
   //if checked then set the score value in local object
   if (event.target.checked) {
-    let isTrumpFactor = 1
-    // handle extra points for trump marriage (pretty sure these names only include the suit if it is a marriage so far)
-    if (currentHand.value.trumpSuit && scoring.name.includes(currentHand.value.trumpSuit)) {
-      isTrumpFactor = 2
-    }
 
     //todo: need to handle extra points in run
 
@@ -322,7 +323,8 @@ function updateScore(event, scoring, scoreType) {
                                         : (scoring.value * isTrumpFactor)
 
   } else {
-    scoreObject.value[scoring.name] = 0
+    // if unchecked see if single/double is still checked first
+    scoreObject.value[scoring.name] = scoring.single || scoring.secondSingle ? (scoring.value * isTrumpFactor) : 0
   }
 
   //handle run with extra king/queen and toggle between double, single run
