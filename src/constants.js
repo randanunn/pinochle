@@ -18,65 +18,93 @@ const SUITS = {
 }
 const SCORING = {
   MARRIAGE: {
-    key: 'MARRIAGE',
     name: 'Marriage',
     value: 20,
     doubleValue: 40,
   },
   RUN: {
-    key: 'RUN',
     name: 'Run',
     value: 150,
     extraKingValue: 20,
     extraQueenValue: 20,
     doubleValue: 1500
   },
+  EXTRA_KING: {
+    name: 'Extra King',
+    subscore: true,
+    value: 20,
+  },
+  EXTRA_QUEEN: {
+    name: 'Extra Queen',
+    subscore: true,
+    value: 20,
+  },
   NINE: {
-    key: 'NINE',
     name: 'Nine of Trump',
     value: 10,
     doubleValue: 20
   },
   ACES: {
-    key: 'ACES',
     name: '100 Aces',
     value: 100,
     doubleValue: 1000
   },
   KINGS: {
-    key: 'KINGS',
     name: '80 Kings',
     value: 80,
     doubleValue: 800,
     affectedByRoundRobin: true
   },
   QUEENS: {
-    key: 'QUEENS',
     name: '60 Queens',
     value: 60,
     doubleValue: 600,
     affectedByRoundRobin: true
   },
   JACKS: {
-    key: 'JACKS',
     name: '40 Jacks',
     value: 40,
     doubleValue: 400
   },
   PINOCHLE: {
-    key: 'PINOCHLE',
     name: 'Pinochle',
     value: 40,
     doubleValue: 300
   }
 }
 
+const NEW_BLANK_HAND = {
+    trumpSuit: '',
+    bid: 350,
+    shootingTheMoon: false,
+    biddingPlayer: { id: null, name: ''},
+    dealer: '',
+    teamOne: {
+      meld: 0,
+      tricks: 0
+    },
+    teamTwo: {
+      meld: 0,
+      tricks: 0
+    }
+}
+
+const WINNING_SCORE = 1500
+//ARE THESE ever not the same?
+const SHOOT_THE_MOON_SCORE = 1500
+const OUT_BACKWARDS_SCORE = -1000
 const AVAILABLE_TRICKS = 25
 const TRICK_POINT_VALUE = 10
+const DEFAULT_PLAYER_NAMES = ['Player 1', 'Player 2', 'Player 3', 'Player 4']
 
 export default {
   SCORING,
   SUITS,
   AVAILABLE_TRICKS,
-  TRICK_POINT_VALUE
+  TRICK_POINT_VALUE,
+  DEFAULT_PLAYER_NAMES,
+  WINNING_SCORE,
+  SHOOT_THE_MOON_SCORE,
+  OUT_BACKWARDS_SCORE,
+  NEW_BLANK_HAND
 }
