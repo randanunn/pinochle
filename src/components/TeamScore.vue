@@ -195,7 +195,7 @@ const props = defineProps({
 
 const store = useAppStore();
 
-const {currentHand, players} = storeToRefs(store)
+const {currentHand, players, slidersSynced } = storeToRefs(store)
 const scoreOptions = ref({})
 const scoreObject = ref({})
 const hasRoundRobin = ref(false)
@@ -230,13 +230,17 @@ const partition = x =>
     .pop();
 
 function changeSlider(event) {
-  if (props.teamNumber === 1) {
-    currentHand.value.teamOne.tricks = event
-    currentHand.value.teamTwo.tricks = Constants.AVAILABLE_TRICKS - currentHand.value.teamOne.tricks
-  } else {
-    currentHand.value.teamTwo.tricks = event
-    currentHand.value.teamOne.tricks = Constants.AVAILABLE_TRICKS - currentHand.value.teamTwo.tricks
-  }
+    if (props.teamNumber === 1) {
+      currentHand.value.teamOne.tricks = event
+      if(slidersSynced.value) {
+        currentHand.value.teamTwo.tricks = Constants.AVAILABLE_TRICKS - currentHand.value.teamOne.tricks
+      }
+    } else {
+      currentHand.value.teamTwo.tricks = event
+      if(slidersSynced.value) {
+        currentHand.value.teamOne.tricks = Constants.AVAILABLE_TRICKS - currentHand.value.teamTwo.tricks
+      }
+    }
 }
 
 function resetTrickCounts() {
@@ -247,20 +251,28 @@ function resetTrickCounts() {
 function decrement() {
   if (props.teamNumber === 1) {
     currentHand.value.teamOne.tricks = currentHand.value.teamOne.tricks > 0 ? currentHand.value.teamOne.tricks - 1 : currentHand.value.teamOne.tricks
-    currentHand.value.teamTwo.tricks = Constants.AVAILABLE_TRICKS - currentHand.value.teamOne.tricks
+    if(slidersSynced.value) {
+      currentHand.value.teamTwo.tricks = Constants.AVAILABLE_TRICKS - currentHand.value.teamOne.tricks
+    }
   } else {
     currentHand.value.teamTwo.tricks = currentHand.value.teamTwo.tricks > 0 ? currentHand.value.teamTwo.tricks - 1 : currentHand.value.teamTwo.tricks
-    currentHand.value.teamOne.tricks = Constants.AVAILABLE_TRICKS - currentHand.value.teamTwo.tricks
+    if(slidersSynced.value) {
+      currentHand.value.teamOne.tricks = Constants.AVAILABLE_TRICKS - currentHand.value.teamTwo.tricks
+    }
   }
 }
 
 function increment() {
   if (props.teamNumber === 1) {
     currentHand.value.teamOne.tricks = currentHand.value.teamOne.tricks < Constants.AVAILABLE_TRICKS ? currentHand.value.teamOne.tricks + 1 : currentHand.value.teamOne.tricks
-    currentHand.value.teamTwo.tricks = Constants.AVAILABLE_TRICKS - currentHand.value.teamOne.tricks
+    if(slidersSynced.value) {
+      currentHand.value.teamTwo.tricks = Constants.AVAILABLE_TRICKS - currentHand.value.teamOne.tricks
+    }
   } else {
     currentHand.value.teamTwo.tricks = currentHand.value.teamTwo.tricks < Constants.AVAILABLE_TRICKS ? currentHand.value.teamTwo.tricks + 1 : currentHand.value.teamTwo.tricks
-    currentHand.value.teamOne.tricks = Constants.AVAILABLE_TRICKS - currentHand.value.teamTwo.tricks
+    if(slidersSynced.value) {
+      currentHand.value.teamOne.tricks = Constants.AVAILABLE_TRICKS - currentHand.value.teamTwo.tricks
+    }
   }
 }
 

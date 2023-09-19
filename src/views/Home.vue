@@ -73,6 +73,12 @@
                       @input="unsetPlayFirstCheckboxes(3)"
                       density="compact" hide-details></v-checkbox>
         </v-card-text>
+        <v-radio-group inline label="Number of Players"
+                       v-model="numberOfPlayers"
+                       @change="setSliderSync()">
+          <v-radio label="Two" :value="2"></v-radio>
+          <v-radio label="Four" :value="4"></v-radio>
+        </v-radio-group>
         <v-card-actions>
           <v-btn :color="Constants.SYSTEM_COLOR"
                  :disabled="!players[0].name || !players[1].name || !players[2].name || !players[3].name"
@@ -81,7 +87,7 @@
           </v-btn>
           <v-btn :color="Constants.SYSTEM_COLOR"
                  @click="savePlayerNames(true)">
-            Use Defaults
+            Use Default Player Names
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -101,7 +107,7 @@ import Constants from "@/constants";
 import cloneDeep from "lodash.clonedeep";
 
 const store = useAppStore();
-const { players, scoringStarted, currentHand } = storeToRefs(store)
+const { players, scoringStarted, currentHand, numberOfPlayers, slidersSynced } = storeToRefs(store)
 
 const showPlayers = ref(true)
 const teamOneComponentRef = ref()
@@ -114,6 +120,10 @@ onBeforeMount(() => {
     window.addEventListener("beforeunload", preventNav)
   }
 })
+
+function setSliderSync() {
+  slidersSynced.value = numberOfPlayers.value !== 2
+}
 
 function preventNav(event) {
   if (!scoringStarted.value) {

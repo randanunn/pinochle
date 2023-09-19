@@ -15,6 +15,8 @@ export const useAppStore = defineStore('app', {
     ],
     scores: [],
     stats: [],
+    numberOfPlayers: 4,
+    slidersSynced: true,
     scoringStarted: false
   }),
 })
