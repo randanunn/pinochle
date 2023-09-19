@@ -17,10 +17,16 @@
               :src="`./assets/${suit.name}.png`"/>
           </v-btn>
         </div>
-        <v-text-field text
-                      class="mt-4"
+        <v-text-field id="bid-input"
+                      text
+                      append-icon="mdi-plus"
+                      @click:append="changeBid(true)"
+                      prepend-icon="mdi-minus"
+                      @click:prepend="changeBid(false)"
+                      class="mt-4 inputPrice"
                       type="number"
                       label="Bid"
+                      hide-spin-buttons
                       hide-details
                       variant="outlined"
                       v-model.number="currentHand.bid">
@@ -198,7 +204,24 @@ function getNextDealer(currentHandDealerId) {
 
 }
 
+function changeBid(increment) {
+  currentHand.value.bid = increment ? currentHand.value.bid + Constants.TRICK_POINT_VALUE : currentHand.value.bid - Constants.TRICK_POINT_VALUE
+}
+
 </script>
+
+<style lang="scss">
+#bid-input::-webkit-outer-spin-button,
+#bid-input::-webkit-inner-spin-button {
+  /* display: none; <- Crashes Chrome on hover */
+  -webkit-appearance: none;
+  margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+#bid-input[type=number] {
+  -moz-appearance:textfield; /* Firefox */
+}
+</style>
 
 <style scoped lang="scss">
 
