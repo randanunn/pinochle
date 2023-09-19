@@ -1,11 +1,6 @@
 <template>
   <v-row class="height-100" v-if="!showPlayers">
     <v-col cols="8">
-      <v-btn color="indigo"
-             v-if="currentHand.trumpSuit && currentHand.biddingPlayer.id"
-             @click="completeHand">
-        Complete Hand
-      </v-btn>
       <TeamScore ref="teamOneComponentRef" :team-number="1"></TeamScore>
 
       <TeamScore ref="teamTwoComponentRef" :team-number="2"></TeamScore>
@@ -13,7 +8,7 @@
     <v-col cols="4">
       <v-row class="height-100">
         <v-col cols="12">
-          <RunningScore></RunningScore>
+          <RunningScore :reset-callback="resetScoreObjectPassthru"></RunningScore>
         </v-col>
       </v-row>
 <!--      <v-row class="height-50">-->
@@ -33,26 +28,50 @@
           Team 1: <br>
           <v-text-field text
                         type="text"
+                        hide-details
                         label="Player 1"
                         v-model="players[0].name">
           </v-text-field>
+          <v-checkbox label="First Dealer"
+                      v-model="players[0].firstDealer"
+                      :disabled="players[0].firstDealer"
+                      @input="unsetPlayFirstCheckboxes(0)"
+                      density="compact" hide-details></v-checkbox>
           <v-text-field text
                         type="text"
+                        hide-details
                         label="Player 2"
                         v-model="players[1].name">
           </v-text-field>
+          <v-checkbox label="First Dealer"
+                      v-model="players[1].firstDealer"
+                      :disabled="players[1].firstDealer"
+                      @input="unsetPlayFirstCheckboxes(1)"
+                      density="compact" hide-details></v-checkbox>
           <br><br>
           Team 2: <br>
           <v-text-field text
                         type="text"
+                        hide-details
                         label="Player 1"
                         v-model="players[2].name">
           </v-text-field>
+          <v-checkbox label="First Dealer"
+                      v-model="players[2].firstDealer"
+                      :disabled="players[2].firstDealer"
+                      @input="unsetPlayFirstCheckboxes(2)"
+                      density="compact" hide-details></v-checkbox>
           <v-text-field text
                         type="text"
+                        hide-details
                         label="Player 2"
                         v-model="players[3].name">
           </v-text-field>
+          <v-checkbox label="First Dealer"
+                      v-model="players[3].firstDealer"
+                      :disabled="players[3].firstDealer"
+                      @input="unsetPlayFirstCheckboxes(3)"
+                      density="compact" hide-details></v-checkbox>
         </v-card-text>
         <v-card-actions>
           <v-btn color="indigo"
@@ -76,18 +95,15 @@ import RunningScore from '@/components/RunningScore.vue'
 import Stats from '@/components/Stats.vue'
 import { useAppStore } from '@/store/app'
 import {storeToRefs} from "pinia"
-import cloneDeep from 'lodash.clonedeep'
 
 import {ref, onBeforeMount} from "vue";
 import Constants from "@/constants";
+import cloneDeep from "lodash.clonedeep";
 
 const store = useAppStore();
-const { currentHand, players, scores, scoringStarted } = storeToRefs(store)
+const { players, scoringStarted, currentHand } = storeToRefs(store)
 
 const showPlayers = ref(true)
-const biddingTeamIsSet = ref(false)
-const biddingTeamShotAndMadeIt = ref(false)
-
 const teamOneComponentRef = ref()
 const teamTwoComponentRef = ref()
 
@@ -116,60 +132,21 @@ function savePlayerNames(useDefaults) {
   }
   showPlayers.value = false
   scoringStarted.value = true
+  currentHand.value.dealingPlayer = cloneDeep(players.value.find(p => p.firstDealer))
 }
 
-function completeHand() {
-  //reset value
-  biddingTeamIsSet.value = false
-  biddingTeamShotAndMadeIt.value = false
-
-  //get current hand score values for bidding team
-  let biddingTeam = currentHand.value.biddingPlayer.teamNumber
-  let biddingTeamTrickScore = biddingTeam === 1 ? currentHand.value.teamOne.tricks * Constants.TRICK_POINT_VALUE : currentHand.value.teamTwo.tricks * Constants.TRICK_POINT_VALUE
-  let biddingTeamMeldScore = biddingTeam === 1 ? currentHand.value.teamOne.meld : currentHand.value.teamTwo.meld
-  let biddingTeamHandScore = biddingTeamTrickScore + biddingTeamMeldScore
-
-  //get current hand score values for non-bidding team
-  let passingTeamTrickScore = biddingTeam === 1 ? currentHand.value.teamTwo.tricks * Constants.TRICK_POINT_VALUE : currentHand.value.teamOne.tricks * Constants.TRICK_POINT_VALUE
-  let passingTeamMeldScore = biddingTeam === 1 ? currentHand.value.teamTwo.meld : currentHand.value.teamOne.meld
-  //if the passing team didn't get any tricks they don't get to keep their meld (unless the other team shot the moon)
-  let passingTeamHandScore = (!currentHand.value.shootingTheMoon && passingTeamTrickScore === 0) ? 0 : passingTeamTrickScore + passingTeamMeldScore
-
-  //if they tried to shoot and failed:
-  if((currentHand.value.shootingTheMoon && (biddingTeamTrickScore !== (Constants.AVAILABLE_TRICKS * Constants.TRICK_POINT_VALUE)))) {
-    biddingTeamIsSet.value = true
-    biddingTeamHandScore = -(Constants.SHOOT_THE_MOON_SCORE)
-  }
-  //else if they tried to shoot they made it
-  else if (currentHand.value.shootingTheMoon) {
-    biddingTeamShotAndMadeIt.value = true
-    passingTeamHandScore = 0
-    biddingTeamHandScore = Constants.SHOOT_THE_MOON_SCORE
-  }
-  //if they over bid and didnt try to make it
-  else if(!currentHand.value.shootingTheMoon && ( (((currentHand.value.bid - biddingTeamMeldScore) / Constants.TRICK_POINT_VALUE) > Constants.AVAILABLE_TRICKS))) {
-    biddingTeamIsSet.value = true
-    biddingTeamHandScore = -(currentHand.value.bid)
-    //the passing team does get their meld points in this scenario
-    passingTeamHandScore = passingTeamMeldScore
-  }
-  //if they tried to make it and failed
-  else if (biddingTeamMeldScore + biddingTeamTrickScore < currentHand.value.bid) {
-    biddingTeamIsSet.value = true
-    biddingTeamHandScore = -(currentHand.value.bid)
-  }
-
-  let gameObject = {
-    teamOneScore: biddingTeam === 1 ? biddingTeamHandScore : passingTeamHandScore,
-    teamTwoScore: biddingTeam === 2 ? biddingTeamHandScore : passingTeamHandScore,
-    handDetails: cloneDeep(currentHand.value)
-  }
-
-  scores.value.push(gameObject)
-  currentHand.value = cloneDeep(Constants.NEW_BLANK_HAND)
-
+function resetScoreObjectPassthru() {
+  //a child cannot emit to different child. so i am emitting from child to parent then back down to
   teamOneComponentRef.value.resetScoreObject();
   teamTwoComponentRef.value.resetScoreObject();
+}
+
+function unsetPlayFirstCheckboxes(playerIndex) {
+  players.value.forEach((p, idx) => {
+    if(idx !== playerIndex) {
+      p.firstDealer = false
+    }
+  })
 }
 
 </script>

@@ -78,7 +78,7 @@ const NEW_BLANK_HAND = {
     bid: 350,
     shootingTheMoon: false,
     biddingPlayer: { id: null, name: ''},
-    dealer: '',
+    dealingPlayer: { id: null, name: ''},
     teamOne: {
       meld: 0,
       tricks: 0
