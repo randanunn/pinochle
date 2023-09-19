@@ -10,7 +10,7 @@
              @click="setTrumpSuit(suit.name)">
 <!--        {{suit.name}}-->
         <v-img
-          :width="20"
+          :width="20" :alt="`${suit.name}`"
           :src="`/src/assets/${suit.name}.png`"/>
       </v-btn>
       <v-text-field text
