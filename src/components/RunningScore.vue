@@ -52,7 +52,7 @@
             <v-img
               class="mr-2"
               :width="15"
-              :src="`/src/assets/${gameScore.handDetails.trumpSuit}.png`"/>
+              :src="`/assets/${gameScore.handDetails.trumpSuit}.png`"/>
             {{ gameScore.handDetails.bid }} {{ gameScore.handDetails.biddingPlayer.name }}
           </div>
         </td>
