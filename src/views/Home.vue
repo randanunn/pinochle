@@ -2,10 +2,10 @@
   <v-row class="height-100" v-if="!showPlayers">
     <v-col cols="8">
       <TeamScore ref="teamOneComponentRef" :team-number="1"></TeamScore>
-
+      <v-divider class="mt-3"></v-divider>
       <TeamScore ref="teamTwoComponentRef" :team-number="2"></TeamScore>
     </v-col>
-    <v-col cols="4">
+    <v-col cols="4" class="right-pane mb-0">
       <v-row class="height-100">
         <v-col cols="12">
           <RunningScore :reset-callback="resetScoreObjectPassthru"></RunningScore>
@@ -74,12 +74,12 @@
                       density="compact" hide-details></v-checkbox>
         </v-card-text>
         <v-card-actions>
-          <v-btn color="indigo"
+          <v-btn :color="Constants.SYSTEM_COLOR"
                  :disabled="!players[0].name || !players[1].name || !players[2].name || !players[3].name"
                  @click="savePlayerNames(false)">
             Save Player Names
           </v-btn>
-          <v-btn color="indigo"
+          <v-btn :color="Constants.SYSTEM_COLOR"
                  @click="savePlayerNames(true)">
             Use Defaults
           </v-btn>
@@ -150,3 +150,9 @@ function unsetPlayFirstCheckboxes(playerIndex) {
 }
 
 </script>
+
+<style scoped lang="scss">
+.right-pane {
+  border-left: solid 1px #E4E4E4;
+}
+</style>

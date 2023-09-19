@@ -1,8 +1,8 @@
 <template>
   <v-row v-if="currentHand.trumpSuit && currentHand.biddingPlayer.id && currentHand.bid % Constants.TRICK_POINT_VALUE === 0" class="height-50">
     <v-col cols="10">
-      <v-card elevation="0" class="px-5">
-        <v-card-title>
+      <v-card elevation="0" class="px-1">
+        <v-card-title class="pb-0">
           <v-toolbar flat color="transparent" density="compact">
             <v-toolbar-title class="ml-0">
               Team {{ teamNumber }}: {{ getPlayerNames() }}
@@ -10,6 +10,7 @@
             <v-spacer></v-spacer>
             <v-toolbar-items>
               <v-checkbox v-if="teamNumber === currentHand.biddingPlayer.teamNumber"
+                          :color="Constants.SYSTEM_COLOR"
                           label="Shoot the Moon"
                           v-model="currentHand.shootingTheMoon"
                           @change="resetScoreObject"
@@ -30,15 +31,23 @@
             Tricks Required: {{ tricksRequired }}
           </span>
         </v-card-subtitle>
-        <v-card-text>
+        <v-card-text class="py-0">
           <v-row>
             <v-col cols="6">
-<!--              todo: should componetize this -->
-              <table>
-                <tr v-for="scoring in column1">
-                  <td style="width: 150px;" :class="{'subscore': scoring.subscore}">{{ scoring.name }}</td>
-                  <td class="pr-2">
-                    <v-checkbox label="Single"
+<!--              todo: should componetize this - sry kayla i was tired -->
+              <table id="scoring-table">
+                <thead>
+                <tr>
+                  <th></th>
+                  <th class="pr-3">Single</th>
+                  <th class="pr-3">Single</th>
+                  <th>Double</th>
+                </tr>
+                </thead>
+                <tr v-for="scoring in column1" class="scoring-row">
+                  <td class="scoring-name-column" :class="{'subscore': scoring.subscore}">{{ scoring.name }}</td>
+                  <td class="text-center">
+                    <v-checkbox :color="Constants.SYSTEM_COLOR"
                                 :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
                                  (scoring.affectedByRoundRobin && hasRoundRobin) ||
                                  (scoring.subscore && !scoreOptions['RUN'].single)"
@@ -50,9 +59,9 @@
                                 density="compact" hide-details>
                     </v-checkbox>
                   </td>
-                  <td class="pr-2">
-                    <v-checkbox label="Single"
-                                v-if="!scoring.hideSecondSingle"
+                  <td class="text-center">
+                    <v-checkbox
+                                v-if="!scoring.hideSecondSingle" :color="Constants.SYSTEM_COLOR"
                                 :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
                                  (scoring.affectedByRoundRobin && hasRoundRobin) ||
                                  (scoring.subscore && !scoreOptions['RUN'].single)"
@@ -64,9 +73,8 @@
                                 density="compact" hide-details>
                     </v-checkbox>
                   </td>
-                  <td>
-                    <v-checkbox v-if="scoring.doubleValue"
-                                label="Double"
+                  <td class="text-center">
+                    <v-checkbox v-if="scoring.doubleValue" :color="Constants.SYSTEM_COLOR"
                                 :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon)"
                                 :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon)"
                                 v-model="scoring.double"
@@ -77,89 +85,99 @@
                 </tr>
               </table>
             </v-col>
-            <table class="ml-5">
-              <tr v-for="scoring in column2">
-                <td :class="{'subscore': scoring.subscore}">{{ scoring.name }}</td>
-                <td>
-                  <v-checkbox label="Single"
-                              :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
+            <v-col cols="6">
+              <table id="scoring-table">
+                <thead>
+                <tr>
+                  <th></th>
+                  <th class="pr-3">Single</th>
+                  <th class="pr-3">Single</th>
+                  <th>Double</th>
+                </tr>
+                </thead>
+                <tr v-for="scoring in column2" class="scoring-row">
+                  <td class="scoring-name-column" :class="{'subscore': scoring.subscore}">{{ scoring.name }}</td>
+                  <td class="text-center">
+                    <v-checkbox :color="Constants.SYSTEM_COLOR"
+                      :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
                                  (scoring.affectedByRoundRobin && hasRoundRobin) ||
                                  (scoring.subscore && !scoreOptions['RUN'].single)"
-                              :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
+                      :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
                                   (scoring.affectedByRoundRobin && hasRoundRobin) ||
                                   (scoring.subscore && !scoreOptions['RUN'].single)"
-                              v-model="scoring.single"
-                              @change="updateScore($event, scoring, 1)"
-                              density="compact" hide-details>
-                  </v-checkbox>
-                </td>
-                <td class="pr-2">
-                  <v-checkbox label="Single"
-                              v-if="!scoring.hideSecondSingle"
-                              :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
+                      v-model="scoring.single"
+                      @change="updateScore($event, scoring, 1)"
+                      density="compact" hide-details>
+                    </v-checkbox>
+                  </td>
+                  <td class="text-center">
+                    <v-checkbox :color="Constants.SYSTEM_COLOR"
+                      v-if="!scoring.hideSecondSingle"
+                      :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
                                  (scoring.affectedByRoundRobin && hasRoundRobin) ||
                                  (scoring.subscore && !scoreOptions['RUN'].single)"
-                              :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
+                      :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
                                   (scoring.affectedByRoundRobin && hasRoundRobin) ||
                                   (scoring.subscore && !scoreOptions['RUN'].single)"
-                              v-model="scoring.secondSingle"
-                              @change="updateScore($event, scoring, 2)"
-                              density="compact" hide-details>
-                  </v-checkbox>
-                </td>
-                <td>
-                  <v-checkbox v-if="scoring.doubleValue"
-                              label="Double"
-                              :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon)"
-                              :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon)"
-                              v-model="scoring.double"
-                              density="compact" hide-details
-                              @change="updateScore($event, scoring, 3)">
-                  </v-checkbox>
-                </td>
-              </tr>
-            </table>
-            <v-col cols="6"></v-col>
+                      v-model="scoring.secondSingle"
+                      @change="updateScore($event, scoring, 2)"
+                      density="compact" hide-details>
+                    </v-checkbox>
+                  </td>
+                  <td class="text-center">
+                    <v-checkbox v-if="scoring.doubleValue" :color="Constants.SYSTEM_COLOR"
+                                :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon)"
+                                :disabled="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon)"
+                                v-model="scoring.double"
+                                density="compact" hide-details
+                                @change="updateScore($event, scoring, 3)">
+                    </v-checkbox>
+                  </td>
+                </tr>
+              </table>
+            </v-col>
           </v-row>
 
         </v-card-text>
       </v-card>
     </v-col>
     <v-col cols="2" class="text-center pt-7">
-      Trick Count:
-      <v-btn color="indigo" variant="text" @click="resetTrickCounts()">Reset</v-btn>
-      <v-slider
-        :model-value="trickCount"
-        :color="sliderColor"
-        thumb-label="always"
-        density="compact"
-        @update:model-value="changeSlider($event)"
-        track-color="grey"
-        direction="vertical"
-        min="0"
-        :max="Constants.AVAILABLE_TRICKS"
-        :step="1"
-      >
-        <template v-slot:prepend>
-          <v-btn
-            size="small"
-            variant="text"
-            icon="mdi-minus"
-            :color="sliderColor"
-            @click="decrement"
-          ></v-btn>
-        </template>
+      <div class="slider-container">
+        Trick Count:
+        <v-btn :color="Constants.SYSTEM_COLOR" variant="text" @click="resetTrickCounts()">Reset</v-btn>
+        <v-slider
+          :model-value="trickCount"
+          :color="Constants.SYSTEM_COLOR"
+          thumb-label="always"
+          density="compact"
+          @update:model-value="changeSlider($event)"
+          track-color="grey"
+          direction="vertical"
+          min="0"
+          :max="Constants.AVAILABLE_TRICKS"
+          :step="1"
+        >
+          <template v-slot:prepend>
+            <v-btn
+              size="small"
+              variant="text"
+              icon="mdi-minus"
+              :color="Constants.SYSTEM_COLOR"
+              @click="decrement"
+            ></v-btn>
+          </template>
 
-        <template v-slot:append>
-          <v-btn
-            size="small"
-            variant="text"
-            icon="mdi-plus"
-            :color="sliderColor"
-            @click="increment"
-          ></v-btn>
-        </template>
-      </v-slider>
+          <template v-slot:append>
+            <v-btn
+              size="small"
+              variant="text"
+              icon="mdi-plus"
+              :color="Constants.SYSTEM_COLOR"
+              @click="increment"
+            ></v-btn>
+          </template>
+        </v-slider>
+      </div>
     </v-col>
   </v-row>
 </template>
@@ -210,8 +228,6 @@ const partition = x =>
       [[], []]))
     .map(x => x.map(x => Object.fromEntries(x)))
     .pop();
-
-const sliderColor = ref('indigo')
 
 function changeSlider(event) {
   if (props.teamNumber === 1) {
@@ -361,8 +377,30 @@ defineExpose({
 
 </script>
 
+
+<style lang="scss">
+.v-slider.v-input--vertical > .v-input__control {
+  min-height: 150px !important;
+}
+</style>
+
 <style scoped lang="scss">
+.slider-container {
+  margin-top: 50px;
+}
+
 .subscore {
   padding-left: 20px;
+}
+.scoring-row {
+  line-height: 10px;
+}
+
+#scoring-table td {
+  line-height: .25rem !important;
+}
+
+.scoring-name-column {
+  width: 120px;
 }
 </style>

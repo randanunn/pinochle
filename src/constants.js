@@ -18,7 +18,7 @@ const SUITS = {
 }
 const SCORING = {
   MARRIAGE: {
-    name: 'Marriage',
+    name: 'K/Q',
     value: 20,
     doubleValue: 40,
   },
@@ -98,6 +98,7 @@ const OUT_BACKWARDS_SCORE = -1000
 const AVAILABLE_TRICKS = 25
 const TRICK_POINT_VALUE = 10
 const DEFAULT_PLAYER_NAMES = ['Player 1', 'Player 2', 'Player 3', 'Player 4']
+const SYSTEM_COLOR = 'indigo'
 
 export default {
   SCORING,
@@ -108,5 +109,6 @@ export default {
   WINNING_SCORE,
   SHOOT_THE_MOON_SCORE,
   OUT_BACKWARDS_SCORE,
-  NEW_BLANK_HAND
+  NEW_BLANK_HAND,
+  SYSTEM_COLOR
 }

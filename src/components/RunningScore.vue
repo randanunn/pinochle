@@ -45,7 +45,7 @@
         ></v-select>
       </v-card-text>
       <v-card-actions v-if="currentHand.trumpSuit && currentHand.biddingPlayer.id">
-        <v-btn color="indigo" variant="flat"
+        <v-btn :color="Constants.SYSTEM_COLOR" variant="flat"
                @click="completeHand">
           Complete Hand
         </v-btn>
@@ -162,8 +162,8 @@ function completeHand() {
     passingTeamHandScore = 0
     biddingTeamHandScore = Constants.SHOOT_THE_MOON_SCORE
   }
-  //if they over bid and didnt try to make it
-  else if (!currentHand.value.shootingTheMoon && ((((currentHand.value.bid - biddingTeamMeldScore) / Constants.TRICK_POINT_VALUE) > Constants.AVAILABLE_TRICKS))) {
+  //if they over bid and didn't play the hand at all (no teams got tricks)
+  else if (!currentHand.value.shootingTheMoon && currentHand.value.teamOne.tricks === 0 && currentHand.value.teamTwo.tricks === 0) {
     biddingTeamIsSet.value = true
     biddingTeamHandScore = -(currentHand.value.bid)
     //the passing team does get their meld points in this scenario

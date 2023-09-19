@@ -27,10 +27,6 @@
 * More data validation
     * runs/too many marriages/80 kings, etc
 
-* Fix double pinochle if each player has half
-    * and each player having 100 aces
-    * each player having run, etc
-
 * 2nd team score trick score missing when game played but lost
     (in non-shoot the moon)
 
