@@ -27,8 +27,5 @@
 * More data validation
     * runs/too many marriages/80 kings, etc
 
-* 2nd team score trick score missing when game played but lost
-    (in non-shoot the moon)
-
 ```
 

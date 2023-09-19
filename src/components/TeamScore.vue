@@ -286,6 +286,7 @@ function resetScoreObject() {
   scoreObject.value = {}
   Object.values(scoreOptions.value).forEach(s => {
     s.single = false
+    s.secondSingle = false
     s.double = false
   })
   updateTeamMeld()
