@@ -1,15 +1,18 @@
 <template>
   <div class="one-hunned">
-    <v-card variant="outlined" class="mt-4 mr-4 pa-3">
-      <v-card-title>
+    <v-card variant="outlined" class="mt-4 mr-4" :class="{'pa-3': !mobile}">
+      <v-card-title v-if="!mobile">
         Current Hand:
       </v-card-title>
       <v-card-text>
-        Dealt by: {{ currentHand.dealingPlayer.name }} <br>
-        Select Trump Suit <br>
-        <div class="d-flex justify-space-around mt-2">
+        <div v-if="!mobile">
+          Dealt by: {{ currentHand.dealingPlayer.name }} <br>
+          Select Trump Suit <br>
+        </div>
+        <div class="d-flex justify-space-around mt-2" :style="{'flex-direction': mobile ? 'column' : 'row'}">
           <v-btn v-for="suit in Constants.SUITS"
                  variant="outlined"
+                 :class="{'mb-2': mobile}"
                  :active="suit.name === currentHand.trumpSuit"
                  @click="setTrumpSuit(suit.name)">
             <v-img
@@ -17,37 +20,35 @@
               :src="`./assets/${suit.name}.png`"/>
           </v-btn>
         </div>
-        <v-text-field id="bid-input"
-                      text
-                      append-icon="mdi-plus"
-                      @click:append="changeBid(true)"
-                      prepend-icon="mdi-minus"
-                      @click:prepend="changeBid(false)"
-                      class="mt-4 inputPrice"
-                      type="number"
-                      label="Bid"
-                      hide-spin-buttons
-                      hide-details
-                      variant="outlined"
-                      v-model.number="currentHand.bid">
-        </v-text-field>
-        <v-select
-          v-model="currentHand.biddingPlayer"
-          :items="players"
-          label="Bidder"
-          class="mt-5"
-          variant="outlined"
-          hide-details
-          placeholder="Select a player..."
-          return-object
-          item-title="name"
-          item-value="id"
-        ></v-select>
+        <div class="d-flex justify-space-around mt-2 flex-column">
+          <v-text-field id="bid-input"
+                        text
+                        append-icon="mdi-plus"
+                        @click:append="changeBid(true)"
+                        prepend-icon="mdi-minus"
+                        @click:prepend="changeBid(false)"
+                        class="mt-4 inputPrice mb-4"
+                        :class="{'vertical-bid-display': mobile}"
+                        type="number"
+                        label="Bid"
+                        hide-spin-buttons
+                        hide-details
+                        variant="outlined"
+                        v-model.number="currentHand.bid">
+          </v-text-field>
+          <v-btn v-for="player in players"
+                 variant="outlined"
+                 class="ma-1"
+                 :active="player.id === currentHand.biddingPlayer.id"
+                 @click="currentHand.biddingPlayer = player">
+            {{ player.name }}
+          </v-btn>
+        </div>
       </v-card-text>
       <v-card-actions v-if="currentHand.trumpSuit && currentHand.biddingPlayer.id">
         <v-btn :color="Constants.SYSTEM_COLOR" variant="flat"
                @click="completeHand">
-          Complete Hand
+          Complete {{ !mobile ? 'Hand' : '' }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -103,7 +104,9 @@
         <strong>Game {{ game.gameNumber }} Final Score</strong>
         <div>
           <span :class="{'success': game.teamOneTotal > game.teamTwoTotal}">Team 1: {{ game.teamOneTotal }} </span>
-          <span :class="{'success': game.teamOneTotal < game.teamTwoTotal}" class="ml-4">Team 2: {{ game.teamTwoTotal }}</span>
+          <span :class="{'success': game.teamOneTotal < game.teamTwoTotal}" class="ml-4">Team 2: {{
+              game.teamTwoTotal
+            }}</span>
         </div>
       </div>
     </v-card>
@@ -150,9 +153,12 @@ import Constants from "@/constants";
 import {useAppStore} from '@/store/app'
 import {storeToRefs} from "pinia";
 import cloneDeep from "lodash.clonedeep";
+import {useDisplay} from 'vuetify'
 
 const store = useAppStore();
 const {currentHand, players, scores, numberOfPlayers, games} = storeToRefs(store)
+
+const {smAndDown: mobile} = useDisplay()
 
 const props = defineProps({
   resetCallback: Function
@@ -290,6 +296,18 @@ function changeBid(increment) {
 #bid-input[type=number] {
   -moz-appearance: textfield; /* Firefox */
 }
+
+.vertical-bid-display > div.v-input__prepend {
+  margin-inline-end: 0 !important;
+  margin-bottom: 10px;
+  align-self: center
+}
+
+.vertical-bid-display > div.v-input__append {
+  margin-inline-start: 0 !important;
+  margin-top: 10px;
+  align-self: center
+}
 </style>
 
 <style scoped lang="scss">
@@ -325,5 +343,10 @@ function changeBid(increment) {
   position: absolute;
   bottom: 10px;
   right: 10px;
+}
+
+.vertical-bid-display {
+  display: flex;
+  flex-direction: column;
 }
 </style>

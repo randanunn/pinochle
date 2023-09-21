@@ -1,10 +1,11 @@
 <template>
   <v-row class="height-100" v-if="!showPlayers">
-    <v-col cols="8">
+    <v-col cols="8" v-if="currentHand.trumpSuit && currentHand.biddingPlayer.id && currentHand.bid % Constants.TRICK_POINT_VALUE === 0">
       <TeamScore ref="teamOneComponentRef" :team-number="1"></TeamScore>
       <v-divider class="mt-3"></v-divider>
       <TeamScore ref="teamTwoComponentRef" :team-number="2"></TeamScore>
     </v-col>
+    <v-col cols="8" v-else class="pa-5">Please Enter Current Hand Info...</v-col>
     <v-col cols="4" class="right-pane mb-0">
       <v-row class="height-100">
         <v-col cols="12">

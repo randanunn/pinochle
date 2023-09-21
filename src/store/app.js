@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia'
 import Constants from '@/constants'
 import cloneDeep from 'lodash.clonedeep'
-
+import {useDisplay} from 'vuetify'
 
 export const useAppStore = defineStore('app', {
   state: () => ({

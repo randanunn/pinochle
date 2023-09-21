@@ -1,21 +1,24 @@
 <template>
-  <v-row v-if="currentHand.trumpSuit && currentHand.biddingPlayer.id && currentHand.bid % Constants.TRICK_POINT_VALUE === 0" class="height-50">
-    <v-col cols="10">
+  <v-row class="height-50 team-score-row">
+    <v-col cols="12">
       <v-card elevation="0" class="px-1">
         <v-card-title class="pb-0">
           <v-toolbar flat color="transparent" density="compact">
             <v-toolbar-title class="ml-0">
-              Team {{ teamNumber }}: {{ getPlayerNames() }}
+              Team {{ teamNumber }}
+              <span v-if="!mobile">: {{ getPlayerNames() }}</span>
             </v-toolbar-title>
             <v-spacer></v-spacer>
             <v-toolbar-items>
-              <v-checkbox v-if="teamNumber === currentHand.biddingPlayer.teamNumber"
-                          :color="Constants.SYSTEM_COLOR"
-                          label="Shoot the Moon"
-                          v-model="currentHand.shootingTheMoon"
-                          @change="resetScoreObject"
-                          density="compact" hide-details>
-              </v-checkbox>
+              <v-btn v-if="teamNumber === currentHand.biddingPlayer.teamNumber"
+                     variant="flat"
+                     :active="currentHand.shootingTheMoon"
+                     :color="Constants.SYSTEM_COLOR"
+                     @click="[currentHand.shootingTheMoon = !currentHand.shootingTheMoon, resetScoreObject]"
+                     density="compact" hide-details>
+                <v-icon>mdi-shield-moon</v-icon>
+                <span class="pl-3" v-if="!mobile">Shoot the Moon</span>
+              </v-btn>
             </v-toolbar-items>
           </v-toolbar>
         </v-card-title>
@@ -31,10 +34,63 @@
             Tricks Required: {{ tricksRequired }}
           </span>
         </v-card-subtitle>
-        <v-card-text class="py-0">
+        <v-card-text class="pa-0">
           <v-row>
-            <v-col cols="6">
-<!--              todo: should componetize this - sry kayla i was tired -->
+            <v-col cols="12" class="px-0">
+              <div class="slider-container">
+                <div class="one-hunned text-right">
+                  <v-btn :color="Constants.SYSTEM_COLOR"
+                         variant="text" @click="resetTrickCounts()">
+                    <v-icon>mdi-refresh</v-icon>
+                    <span v-if="!mobile">Reset Tricks</span>
+                  </v-btn>
+                </div>
+                <v-slider
+                  :model-value="trickCount"
+                  :color="Constants.SYSTEM_COLOR"
+                  thumb-label="always"
+                  density="compact"
+                  @update:model-value="changeSlider($event)"
+                  track-color="grey"
+                  direction="horizontal"
+                  hide-details
+                  :label="mobile ? '' : 'Trick Count'"
+                  min="0"
+                  :max="Constants.AVAILABLE_TRICKS"
+                  :step="1"
+                >
+                  <template v-slot:prepend>
+                    <v-btn
+                      size="small"
+                      variant="text"
+                      icon="mdi-minus"
+                      :color="Constants.SYSTEM_COLOR"
+                      @click="decrement"
+                    ></v-btn>
+                  </template>
+
+                  <template v-slot:append>
+                    <v-btn
+                      size="small"
+                      variant="text"
+                      icon="mdi-plus"
+                      :color="Constants.SYSTEM_COLOR"
+                      @click="increment"
+                    ></v-btn>
+                  </template>
+                </v-slider>
+              </div>
+            </v-col>
+          </v-row>
+          <v-row v-if="currentHand.shootingTheMoon && teamNumber === currentHand.biddingPlayer.teamNumber"
+                 class="pa-10">
+            <v-col cols="12">
+              Shooting the moon!!! <br>
+              <v-icon size="70" :color="Constants.SYSTEM_COLOR">mdi-shield-moon</v-icon>
+            </v-col>
+          </v-row>
+          <v-row v-else>
+            <v-col :cols="mobile ? 12 : 6" class="px-6">
               <table id="scoring-table">
                 <thead>
                 <tr>
@@ -44,8 +100,12 @@
                   <th>Double</th>
                 </tr>
                 </thead>
-                <tr v-for="scoring in column1" class="scoring-row">
-                  <td class="scoring-name-column" :class="{'subscore': scoring.subscore}">{{ scoring.name }}</td>
+                <tr v-for="scoring in mobile ? scoreOptions : column1">
+                  <td class="scoring-name-column" :class="{'subscore': scoring.subscore}">
+                    <div :class="{'trump-suit-match': scoring.name.includes(currentHand.trumpSuit)}">
+                      {{ scoring.name === '9 of Trump' ? `9 of ${currentHand.trumpSuit}` : scoring.name }}
+                    </div>
+                  </td>
                   <td class="text-center">
                     <v-checkbox :color="Constants.SYSTEM_COLOR"
                                 :readonly="(teamNumber === currentHand.biddingPlayer.teamNumber && currentHand.shootingTheMoon) ||
@@ -85,7 +145,7 @@
                 </tr>
               </table>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="6" v-if="!mobile">
               <table id="scoring-table">
                 <thead>
                 <tr>
@@ -141,44 +201,6 @@
         </v-card-text>
       </v-card>
     </v-col>
-    <v-col cols="2" class="text-center pt-7">
-      <div class="slider-container">
-        Trick Count:
-        <v-btn :color="Constants.SYSTEM_COLOR" variant="text" @click="resetTrickCounts()">Reset</v-btn>
-        <v-slider
-          :model-value="trickCount"
-          :color="Constants.SYSTEM_COLOR"
-          thumb-label="always"
-          density="compact"
-          @update:model-value="changeSlider($event)"
-          track-color="grey"
-          direction="vertical"
-          min="0"
-          :max="Constants.AVAILABLE_TRICKS"
-          :step="1"
-        >
-          <template v-slot:prepend>
-            <v-btn
-              size="small"
-              variant="text"
-              icon="mdi-minus"
-              :color="Constants.SYSTEM_COLOR"
-              @click="decrement"
-            ></v-btn>
-          </template>
-
-          <template v-slot:append>
-            <v-btn
-              size="small"
-              variant="text"
-              icon="mdi-plus"
-              :color="Constants.SYSTEM_COLOR"
-              @click="increment"
-            ></v-btn>
-          </template>
-        </v-slider>
-      </div>
-    </v-col>
   </v-row>
 </template>
 
@@ -188,7 +210,9 @@ import cloneDeep from 'lodash.clonedeep'
 import {storeToRefs} from 'pinia'
 import {useAppStore} from '@/store/app'
 import {ref, computed, onMounted} from 'vue'
+import {useDisplay} from 'vuetify'
 
+const {smAndDown: mobile} = useDisplay()
 const props = defineProps({
   teamNumber: Number
 })
@@ -398,15 +422,20 @@ defineExpose({
 </style>
 
 <style scoped lang="scss">
+.team-score-row {
+  overflow: auto;
+}
+
+.team-score-row::-webkit-scrollbar {
+  display: none;
+}
+
 .slider-container {
-  margin-top: 50px;
+  margin-top: 10px;
 }
 
 .subscore {
   padding-left: 20px;
-}
-.scoring-row {
-  line-height: 10px;
 }
 
 #scoring-table td {
@@ -415,5 +444,10 @@ defineExpose({
 
 .scoring-name-column {
   width: 120px;
+}
+
+.trump-suit-match {
+  color: #3F51B5;
+  font-weight: 600;
 }
 </style>
